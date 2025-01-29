@@ -2,10 +2,14 @@ package models;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class Building {
     private List<Room> rooms;
     private double requestedTemperature;
+    private ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
     public Building(double requestedTemperature) {
         this.rooms = new ArrayList<>();
@@ -34,6 +38,18 @@ public class Building {
         for (Room room : rooms) {
             room.updateTemperature(requestedTemperature, threshold);
         }
+    }
+
+    public void startRecalculationTask() {
+        scheduler.scheduleAtFixedRate(() -> {
+            recalculateRooms();
+            System.out.println("Scheduled Recalculation Performed:");
+            System.out.println(this);
+        }, 0, 10, TimeUnit.SECONDS); // Recalculate every 10 seconds
+    }
+
+    public void stopRecalculationTask() {
+        scheduler.shutdown();
     }
 
     @Override
