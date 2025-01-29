@@ -9,7 +9,7 @@ import java.util.concurrent.TimeUnit;
 public class Building {
     private List<Room> rooms;
     private double requestedTemperature;
-    private ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
     public Building(double requestedTemperature) {
         this.rooms = new ArrayList<>();
@@ -36,7 +36,7 @@ public class Building {
     public void recalculateRooms() {
         double threshold = 1.0; // "Close enough" threshold
         for (Room room : rooms) {
-            room.updateTemperature(requestedTemperature, threshold);
+            room.updateTemperatureControl(requestedTemperature, threshold);
         }
     }
 
@@ -44,19 +44,26 @@ public class Building {
         scheduler.scheduleAtFixedRate(() -> {
             recalculateRooms();
             System.out.println("Scheduled Recalculation Performed:");
-            System.out.println(this);
-        }, 0, 10, TimeUnit.SECONDS); // Recalculate every 10 seconds
+            for (Room room : rooms) {
+                System.out.println(room);
+            }
+        }, 0, 10, TimeUnit.SECONDS); // Check every 10 seconds if heating/cooling should be enabled or disabled
     }
 
     public void stopRecalculationTask() {
         scheduler.shutdown();
+        for (Room room : rooms) {
+            room.stopTemperatureAdjustment();
+        }
     }
 
     @Override
     public String toString() {
-        return "Building{" +
-                "rooms=" + rooms +
-                ", requestedTemperature=" + requestedTemperature +
-                '}';
+        StringBuilder sb = new StringBuilder();
+        sb.append("Building { requestedTemperature=").append(requestedTemperature).append(" }\n");
+        for (Room room : rooms) {
+            sb.append(room).append("\n");
+        }
+        return sb.toString();
     }
 }
