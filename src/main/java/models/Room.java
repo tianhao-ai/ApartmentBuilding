@@ -4,6 +4,7 @@ import java.util.Random;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import utils.PropertyLoader;
 
 public class Room {
     private static int idCounter = 1;
@@ -13,8 +14,8 @@ public class Room {
     private boolean heatingEnabled;
     private boolean coolingEnabled;
 
-    private static final double TEMP_CHANGE_RATE = 0.1; // Change per second
-    private static final double TEMP_UPDATE_INTERVAL = 1; // Seconds
+    private static final double TEMP_CHANGE_RATE = PropertyLoader.getDoubleProperty("temperature.change.rate");
+    private static final double TEMP_UPDATE_INTERVAL = PropertyLoader.getDoubleProperty("temperature.update.interval");
 
     private final ScheduledExecutorService temperatureScheduler = Executors.newScheduledThreadPool(1);
 

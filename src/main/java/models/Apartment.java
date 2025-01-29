@@ -1,7 +1,9 @@
 package models;
 
+import utils.PropertyLoader;
+
 public class Apartment extends Room {
-    private static int nextApartmentNumber = 101; // Start at 101
+    private static int nextApartmentNumber = PropertyLoader.getIntProperty("apartment.starting.number");
 
     private String ownerName;
     private final int apartmentNumber;

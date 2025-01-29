@@ -6,6 +6,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import utils.PropertyLoader;
+
 public class Building {
     private List<Room> rooms;
     private double requestedTemperature;
@@ -34,7 +36,7 @@ public class Building {
     }
 
     public void recalculateRooms() {
-        double threshold = 1.0; // "Close enough" threshold
+        double threshold = PropertyLoader.getDoubleProperty("temperature.threshold");
         for (Room room : rooms) {
             room.updateTemperatureControl(requestedTemperature, threshold);
         }
