@@ -25,8 +25,24 @@ chmod +x run-app.sh
 ```bash
 brew install --cask xquartz
 ```
-2. Start XQuartz and enable "Allow connections from network clients" in Preferences
-3. Run:
+
+2. Configure XQuartz properly:
+   - Start XQuartz (from Applications/Utilities or using Spotlight)
+   - Open XQuartz Preferences (⌘+,)
+   - Go to the "Security" tab
+   - Uncheck "Authenticate connections"
+   - Check "Allow connections from network clients"
+   - Close Preferences
+   - Restart XQuartz for changes to take effect
+
+3. If you encounter "cannot connect to X11 window server" error:
+   - Make sure you've completed step 2 above
+   - Quit XQuartz completely (⌘+Q)
+   - Wait a few seconds
+   - Start XQuartz again
+   - Try running the application again
+
+4. Run the application:
 ```bash
 chmod +x run-app.sh
 ./run-app.sh
