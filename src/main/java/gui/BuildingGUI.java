@@ -9,63 +9,109 @@ import java.awt.event.FocusEvent;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import utils.PropertyLoader;
 
+/**
+ * A graphical user interface for managing building temperature control system.
+ * This class provides a comprehensive GUI that allows users to:
+ * 
+ * - Monitor real-time temperatures of apartments and common rooms
+ * - Set and adjust the building's target temperature
+ * - Add new apartments with owner information
+ * - Add common areas (gym, library, laundry)
+ * 
+ * The interface automatically updates to reflect temperature changes
+ * and maintains a consistent view of the building's state.
+ *
+ * @see Building
+ * @see Room
+ * @see Apartment
+ * @see CommonRoom
+ */
 public class BuildingGUI {
+    /** The building instance being managed */
     private Building building;
 
-    // List Models for Apartments and Common Rooms
+    /** List models for displaying room information */
     private DefaultListModel<String> apartmentListModel = new DefaultListModel<>();
     private DefaultListModel<String> commonRoomListModel = new DefaultListModel<>();
 
+    /** UI components for room displays */
     private JList<String> apartmentList;
     private JList<String> commonRoomList;
 
-    // Executor for real-time temperature updates
+    /** Scheduler for periodic UI updates */
     private ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
+    /**
+     * Creates a new BuildingGUI instance and initializes the interface.
+     * This constructor will:
+     * 
+     * - Set up the main window and all UI components
+     * - Initialize temperature monitoring
+     * - Start periodic updates of the display
+     *
+     * @param building The building instance to be managed through this interface
+     * @throws IllegalArgumentException if building is null
+     */
     public BuildingGUI(Building building) {
+        if (building == null) {
+            throw new IllegalArgumentException("Building instance cannot be null");
+        }
         this.building = building;
         createAndShowGUI();
         startTemperatureUpdates();
     }
 
+    /**
+     * Creates and displays the main application window.
+     * Sets up all UI components including:
+     * 
+     * - Temperature control panel
+     * - Room lists (apartments and common areas)
+     * - Add room functionality
+     */
     private void createAndShowGUI() {
-        JFrame frame = new JFrame("Building Controls");
+        JFrame frame = new JFrame(PropertyLoader.getProperty("gui.window.title"));
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(500, 400);
+        frame.setSize(
+            PropertyLoader.getIntProperty("gui.window.width"),
+            PropertyLoader.getIntProperty("gui.window.height")
+        );
         frame.setLayout(new BorderLayout());
 
-        // Panels for Apartments and Common Rooms
-        JPanel roomPanel = new JPanel(new GridLayout(1, 2));
+        // ----- Panels for Apartments and Common Rooms -----
+        JPanel roomPanel = new JPanel(new GridLayout(1, 2)); // Two columns layout
         JPanel apartmentPanel = new JPanel(new BorderLayout());
         JPanel commonRoomPanel = new JPanel(new BorderLayout());
 
-        // Apartment List
+        // Apartment List Panel
         apartmentList = new JList<>(apartmentListModel);
         JScrollPane apartmentScroll = new JScrollPane(apartmentList);
         apartmentPanel.add(new JLabel("Apartments"), BorderLayout.NORTH);
         apartmentPanel.add(apartmentScroll, BorderLayout.CENTER);
 
-        // Common Room List
+        // Common Room List Panel
         commonRoomList = new JList<>(commonRoomListModel);
         JScrollPane commonRoomScroll = new JScrollPane(commonRoomList);
         commonRoomPanel.add(new JLabel("Common Rooms"), BorderLayout.NORTH);
         commonRoomPanel.add(commonRoomScroll, BorderLayout.CENTER);
 
-        // Add to the roomPanel
+        // Add both panels to the main roomPanel
         roomPanel.add(apartmentPanel);
         roomPanel.add(commonRoomPanel);
 
-        // Temperature Control
+        // ----- Temperature Control Panel -----
         JPanel tempPanel = new JPanel(new FlowLayout());
         JLabel tempLabel = new JLabel("Set Temperature:");
-        JTextField tempField = new JTextField(5);
+        JTextField tempField = new JTextField(PropertyLoader.getIntProperty("gui.temperature.field.width"));
         JButton setTempButton = new JButton("Set");
 
         tempPanel.add(tempLabel);
         tempPanel.add(tempField);
         tempPanel.add(setTempButton);
 
+        // Action: Set the requested temperature
         setTempButton.addActionListener(e -> {
             try {
                 double newTemp = Double.parseDouble(tempField.getText());
@@ -77,26 +123,39 @@ public class BuildingGUI {
             }
         });
 
-        // "Add Room" Button
+        // ----- "Add Room" Button -----
         JButton addRoomButton = new JButton("Add Room");
         addRoomButton.addActionListener(e -> showAddRoomDialog());
 
-        // Bottom Panel for Adding Rooms
+        // Bottom Panel for the "Add Room" button
         JPanel bottomPanel = new JPanel(new FlowLayout());
         bottomPanel.add(addRoomButton);
 
-        // Add components to frame
+        // Add all components to the frame
         frame.add(roomPanel, BorderLayout.CENTER);
         frame.add(tempPanel, BorderLayout.NORTH);
         frame.add(bottomPanel, BorderLayout.SOUTH);
 
+        // Populate initial data
         refreshRoomLists();
         frame.setVisible(true);
     }
 
+    /**
+     * Displays a modal dialog for adding new rooms to the building.
+     * The dialog provides options for:
+     * 
+     * - Adding apartments with owner information
+     * - Adding common rooms of various types (GYM, LIBRARY, LAUNDRY)
+     * 
+     * Input validation is performed before adding any new room.
+     */
     private void showAddRoomDialog() {
         JDialog dialog = new JDialog((Frame) null, "Add Room", true);
-        dialog.setSize(300, 200);
+        dialog.setSize(
+            PropertyLoader.getIntProperty("gui.dialog.width"),
+            PropertyLoader.getIntProperty("gui.dialog.height")
+        );
         dialog.setLayout(new FlowLayout());
 
         JLabel roomTypeLabel = new JLabel("Select Room Type:");
@@ -111,14 +170,14 @@ public class BuildingGUI {
 
         JButton addRoomButton = new JButton("Add");
 
-        // Handle room type selection
+        // Action: Show the correct input field based on selection
         roomTypeCombo.addActionListener(e -> {
             String selectedType = (String) roomTypeCombo.getSelectedItem();
             ownerNameField.setVisible(selectedType.equals("Apartment"));
             commonRoomDropdown.setVisible(selectedType.equals("Common Room"));
         });
 
-        // Handle adding a new room
+        // Action: Add a new room based on user input
         addRoomButton.addActionListener(e -> {
             String selectedType = (String) roomTypeCombo.getSelectedItem();
             if ("Apartment".equals(selectedType)) {
@@ -149,7 +208,22 @@ public class BuildingGUI {
         dialog.setVisible(true);
     }
 
+    /**
+     * Configures a text field with placeholder text functionality.
+     * The placeholder text will:
+     * 
+     * - Display in gray when the field is empty
+     * - Disappear when the field gains focus
+     * - Reappear when the field loses focus and is empty
+     *
+     * @param textField The text field to configure
+     * @param placeholderText The text to display as placeholder
+     * @throws IllegalArgumentException if either parameter is null
+     */
     private void setPlaceholder(JTextField textField, String placeholderText) {
+        if (textField == null || placeholderText == null) {
+            throw new IllegalArgumentException("TextField and placeholder text cannot be null");
+        }
         textField.setForeground(Color.GRAY);
         textField.setText(placeholderText);
 
@@ -172,6 +246,17 @@ public class BuildingGUI {
         });
     }
 
+    /**
+     * Updates the display of all rooms in the GUI.
+     * This method:
+     * 
+     * - Clears existing room displays
+     * - Retrieves current room information from the building
+     * - Updates both apartment and common room lists
+     * - Formats temperature and status information
+     * 
+     * Updates are performed on the Event Dispatch Thread to ensure thread safety.
+     */
     private void refreshRoomLists() {
         SwingUtilities.invokeLater(() -> {
             apartmentListModel.clear();
@@ -193,8 +278,21 @@ public class BuildingGUI {
         });
     }
 
+    /**
+     * Initiates periodic updates of the room temperature display.
+     * Updates occur at intervals specified in the application properties.
+     * The update frequency can be configured through the 'gui.refresh.interval' property.
+     *
+     * @see PropertyLoader#getIntProperty(String)
+     */
     private void startTemperatureUpdates() {
-        scheduler.scheduleAtFixedRate(this::refreshRoomLists, 0, 1, TimeUnit.SECONDS);
+        scheduler.scheduleAtFixedRate(
+            this::refreshRoomLists,
+            0,
+            PropertyLoader.getIntProperty("gui.refresh.interval"),
+            TimeUnit.SECONDS
+        );
     }
 }
+
 

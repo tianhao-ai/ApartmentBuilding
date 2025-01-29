@@ -17,6 +17,7 @@ repositories {
 dependencies {
     // Add any required dependencies here
     testImplementation 'junit:junit:4.13.2'
+    implementation 'org.apache.commons:commons-configuration2:2.8.0'
 }
 
 tasks.withType(JavaCompile) {
