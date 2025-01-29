@@ -94,11 +94,19 @@ chmod +x run-app.sh
 If you want to build without Docker:
 
 1. Ensure JDK 17 is installed
-2. Build:
+
+2. Clean and build the project:
 ```bash
-./gradlew build
+./gradlew clean build
 ```
-3. Run:
+
+3. Run the application:
 ```bash
+# On Windows
+java -jar build/libs/apartment-building.jar
+
+# On Linux/macOS
 java -jar build/libs/apartment-building.jar
 ```
+
+Note: When building from source, make sure you have a proper X11 server running on your system as described in the platform-specific setup instructions above.
