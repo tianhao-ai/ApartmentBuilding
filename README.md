@@ -2,6 +2,8 @@
 
 A Java Swing application for managing temperature control in an apartment building.
 
+![Application Interface](application_interface.png)
+
 ## Project Structure
 
 ```
@@ -159,3 +161,7 @@ If you encounter permission denied errors:
 chmod +x gradlew
 chmod +x run-app.sh
 ```
+
+## Acknowledgements
+
+This application was developed as part of the hiring process at [Conserve IT](https://www.conserveit.com.au/). Special thanks to the Conserve IT team for their support, guidance, and the opportunity to work on this project. The project demonstrates practical applications of building automation and temperature control systems, which aligns with Conserve IT's expertise in building management and energy conservation solutions.
