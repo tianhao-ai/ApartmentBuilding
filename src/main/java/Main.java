@@ -1,8 +1,9 @@
 import models.*;
+import gui.BuildingGUI;
 
 public class Main {
     public static void main(String[] args) {
-        // Create the building
+        // Create the building with initial temperature
         Building building = new Building(25.0);
 
         // Add initial apartments
@@ -13,13 +14,10 @@ public class Main {
         building.addRoom(new CommonRoom(CommonRoom.RoomType.GYM));
         building.addRoom(new CommonRoom(CommonRoom.RoomType.LIBRARY));
 
-        // Initial state
-        System.out.println("Initial State of Building:");
-        System.out.println(building);
+        // Start periodic recalculation
+        building.startRecalculationTask();
 
-        // Simulate recalculation
-        building.recalculateRooms();
-        System.out.println("After Recalculation:");
-        System.out.println(building);
+        // Launch GUI
+        new BuildingGUI(building);
     }
 }
