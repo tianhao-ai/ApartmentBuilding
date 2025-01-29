@@ -1,10 +1,11 @@
 package gui;
 
 import models.*;
+
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -35,7 +36,7 @@ public class BuildingGUI {
         frame.setLayout(new BorderLayout());
 
         // Panels for Apartments and Common Rooms
-        JPanel roomPanel = new JPanel(new GridLayout(1, 2)); // Two columns
+        JPanel roomPanel = new JPanel(new GridLayout(1, 2));
         JPanel apartmentPanel = new JPanel(new BorderLayout());
         JPanel commonRoomPanel = new JPanel(new BorderLayout());
 
@@ -76,72 +77,99 @@ public class BuildingGUI {
             }
         });
 
-        // Add Room Panel
-        JPanel addRoomPanel = new JPanel(new FlowLayout());
-        JLabel roomTypeLabel = new JLabel("Add Room:");
-        String[] roomTypes = {"Apartment", "Common Room"};
-        JComboBox<String> roomTypeCombo = new JComboBox<>(roomTypes);
+        // "Add Room" Button
+        JButton addRoomButton = new JButton("Add Room");
+        addRoomButton.addActionListener(e -> showAddRoomDialog());
 
-        // Input field for Apartment Owner Name (Common Room now uses dropdown)
-        JTextField ownerNameField = new JTextField(10);
-
-        // Dropdown for selecting Common Room Type
-        JComboBox<String> commonRoomDropdown = new JComboBox<>(new String[]{"Gym", "Library", "Laundry"});
-        commonRoomDropdown.setVisible(false); // Initially hidden
-
-        JButton addRoomButton = new JButton("Add");
-
-        addRoomPanel.add(roomTypeLabel);
-        addRoomPanel.add(roomTypeCombo);
-        addRoomPanel.add(ownerNameField);
-        addRoomPanel.add(commonRoomDropdown);
-        addRoomPanel.add(addRoomButton);
-
-        // Change input field when selecting a room type
-        roomTypeCombo.addActionListener(e -> {
-            String selectedType = (String) roomTypeCombo.getSelectedItem();
-            if (selectedType.equals("Apartment")) {
-                ownerNameField.setVisible(true);
-                commonRoomDropdown.setVisible(false);
-                ownerNameField.setText(""); // Clear input when switching
-            } else {
-                ownerNameField.setVisible(false);
-                commonRoomDropdown.setVisible(true);
-            }
-            addRoomPanel.revalidate();
-            addRoomPanel.repaint();
-        });
-
-        addRoomButton.addActionListener(e -> {
-            String selectedType = (String) roomTypeCombo.getSelectedItem();
-
-            if (selectedType.equals("Apartment")) {
-                String ownerName = ownerNameField.getText();
-                if (ownerName.isEmpty()) {
-                    JOptionPane.showMessageDialog(frame, "Please provide an owner's name!", "Error", JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-                building.addRoom(new Apartment(ownerName));
-                JOptionPane.showMessageDialog(frame, "Apartment added for owner: " + ownerName);
-            } else {
-                // Common Room selection from dropdown
-                String selectedCommonRoom = (String) commonRoomDropdown.getSelectedItem();
-                CommonRoom.RoomType type = CommonRoom.RoomType.valueOf(selectedCommonRoom.toUpperCase());
-                building.addRoom(new CommonRoom(type));
-                JOptionPane.showMessageDialog(frame, "Common Room of type '" + selectedCommonRoom + "' added!");
-            }
-
-            refreshRoomLists();
-        });
+        // Bottom Panel for Adding Rooms
+        JPanel bottomPanel = new JPanel(new FlowLayout());
+        bottomPanel.add(addRoomButton);
 
         // Add components to frame
         frame.add(roomPanel, BorderLayout.CENTER);
         frame.add(tempPanel, BorderLayout.NORTH);
-        frame.add(addRoomPanel, BorderLayout.SOUTH);
+        frame.add(bottomPanel, BorderLayout.SOUTH);
 
-        refreshRoomLists(); // Populate initial data
-
+        refreshRoomLists();
         frame.setVisible(true);
+    }
+
+    private void showAddRoomDialog() {
+        JDialog dialog = new JDialog((Frame) null, "Add Room", true);
+        dialog.setSize(300, 200);
+        dialog.setLayout(new FlowLayout());
+
+        JLabel roomTypeLabel = new JLabel("Select Room Type:");
+        String[] roomTypes = {"Apartment", "Common Room"};
+        JComboBox<String> roomTypeCombo = new JComboBox<>(roomTypes);
+
+        JTextField ownerNameField = new JTextField(15);
+        setPlaceholder(ownerNameField, "Enter owner's name");
+
+        JComboBox<String> commonRoomDropdown = new JComboBox<>(new String[]{"Gym", "Library", "Laundry"});
+        commonRoomDropdown.setVisible(false);
+
+        JButton addRoomButton = new JButton("Add");
+
+        // Handle room type selection
+        roomTypeCombo.addActionListener(e -> {
+            String selectedType = (String) roomTypeCombo.getSelectedItem();
+            ownerNameField.setVisible(selectedType.equals("Apartment"));
+            commonRoomDropdown.setVisible(selectedType.equals("Common Room"));
+        });
+
+        // Handle adding a new room
+        addRoomButton.addActionListener(e -> {
+            String selectedType = (String) roomTypeCombo.getSelectedItem();
+            if ("Apartment".equals(selectedType)) {
+                String ownerName = ownerNameField.getText().trim();
+                if (ownerName.isEmpty() || ownerName.equals("Enter owner's name")) {
+                    JOptionPane.showMessageDialog(dialog, "Please provide an owner's name!", "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                building.addRoom(new Apartment(ownerName));
+                JOptionPane.showMessageDialog(dialog, "Apartment added for owner: " + ownerName);
+            } else {
+                String selectedCommonRoom = (String) commonRoomDropdown.getSelectedItem();
+                CommonRoom.RoomType type = CommonRoom.RoomType.valueOf(selectedCommonRoom.toUpperCase());
+                building.addRoom(new CommonRoom(type));
+                JOptionPane.showMessageDialog(dialog, "Common Room of type '" + selectedCommonRoom + "' added!");
+            }
+            refreshRoomLists();
+            dialog.dispose();
+        });
+
+        // Add components to dialog
+        dialog.add(roomTypeLabel);
+        dialog.add(roomTypeCombo);
+        dialog.add(ownerNameField);
+        dialog.add(commonRoomDropdown);
+        dialog.add(addRoomButton);
+
+        dialog.setVisible(true);
+    }
+
+    private void setPlaceholder(JTextField textField, String placeholderText) {
+        textField.setForeground(Color.GRAY);
+        textField.setText(placeholderText);
+
+        textField.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                if (textField.getText().equals(placeholderText)) {
+                    textField.setText("");
+                    textField.setForeground(Color.BLACK);
+                }
+            }
+
+            @Override
+            public void focusLost(FocusEvent e) {
+                if (textField.getText().isEmpty()) {
+                    textField.setForeground(Color.GRAY);
+                    textField.setText(placeholderText);
+                }
+            }
+        });
     }
 
     private void refreshRoomLists() {
@@ -169,3 +197,4 @@ public class BuildingGUI {
         scheduler.scheduleAtFixedRate(this::refreshRoomLists, 0, 1, TimeUnit.SECONDS);
     }
 }
+
