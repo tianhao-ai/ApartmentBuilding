@@ -61,18 +61,33 @@ case $OS in
         if ! pgrep -x "Xquartz" > /dev/null; then
             echo "Starting XQuartz..."
             open -a XQuartz
-            sleep 2
+            sleep 3  # Give XQuartz more time to start
         fi
         
-        # Allow connections from Docker
-        xhost + localhost
+        # Set up XQuartz permissions
+        xhost + 127.0.0.1
         
-        # Get IP address
+        # Get IP address for display
         IP=$(ifconfig en0 | grep inet | awk '$1=="inet" {print $2}')
+        if [ -z "$IP" ]; then
+            # Try alternative network interfaces if en0 fails
+            IP=$(ifconfig en1 | grep inet | awk '$1=="inet" {print $2}')
+        fi
+        if [ -z "$IP" ]; then
+            IP="127.0.0.1"
+        fi
         
+        echo "Using display at $IP:0"
+        
+        # Ensure XQuartz is ready
+        echo "Waiting for XQuartz to be ready..."
+        sleep 2
+        
+        # Run the container with proper X11 forwarding
         docker run -it --rm \
             -e DISPLAY=$IP:0 \
             -v /tmp/.X11-unix:/tmp/.X11-unix \
+            -e XAUTHORITY=/tmp/.docker.xauth \
             apartment-building
         ;;
         

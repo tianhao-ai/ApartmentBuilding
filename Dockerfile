@@ -17,13 +17,13 @@ RUN apt-get update && apt-get install -y \
     libfreetype6 \
     libfontconfig1 \
     fonts-dejavu \
+    x11-utils \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 COPY --from=builder /app/build/libs/apartment-building.jar app.jar
 
 # Set environment variables for GUI
-ENV DISPLAY=:0
-ENV JAVA_TOOL_OPTIONS="-Dsun.java2d.xrender=false"
+ENV JAVA_TOOL_OPTIONS="-Dsun.java2d.xrender=false -Dsun.java2d.opengl=false"
 
 ENTRYPOINT ["java", "-jar", "app.jar"] 
