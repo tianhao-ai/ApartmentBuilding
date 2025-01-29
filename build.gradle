@@ -30,4 +30,6 @@ jar {
                 'Main-Class': 'Main'
         )
     }
+    archiveBaseName = 'apartment-building'
+    archiveVersion = ''
 }

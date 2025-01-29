@@ -80,6 +80,9 @@ public class BuildingGUI {
         );
         frame.setLayout(new BorderLayout());
 
+        // Center the main window on screen
+        frame.setLocationRelativeTo(null);
+
         // ----- Panels for Apartments and Common Rooms -----
         JPanel roomPanel = new JPanel(new GridLayout(1, 2)); // Two columns layout
         JPanel apartmentPanel = new JPanel(new BorderLayout());
@@ -157,6 +160,9 @@ public class BuildingGUI {
             PropertyLoader.getIntProperty("gui.dialog.height")
         );
         dialog.setLayout(new FlowLayout());
+
+        // Center the dialog on screen
+        dialog.setLocationRelativeTo(null);
 
         JLabel roomTypeLabel = new JLabel("Select Room Type:");
         String[] roomTypes = {"Apartment", "Common Room"};
