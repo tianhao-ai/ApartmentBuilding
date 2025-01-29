@@ -12,43 +12,64 @@ import java.util.concurrent.TimeUnit;
 import utils.PropertyLoader;
 
 /**
- * GUI class for controlling the building temperature and managing rooms.
- * This class provides a graphical interface to:
- * - View apartments and common rooms with their temperatures.
- * - Set a global requested temperature for the building.
- * - Add new apartments and common rooms via a pop-up dialog.
- * - Automatically refresh temperature updates at fixed intervals.
+ * A graphical user interface for managing building temperature control system.
+ * This class provides a comprehensive GUI that allows users to:
+ * 
+ * - Monitor real-time temperatures of apartments and common rooms
+ * - Set and adjust the building's target temperature
+ * - Add new apartments with owner information
+ * - Add common areas (gym, library, laundry)
+ * 
+ * The interface automatically updates to reflect temperature changes
+ * and maintains a consistent view of the building's state.
+ *
+ * @see Building
+ * @see Room
+ * @see Apartment
+ * @see CommonRoom
  */
 public class BuildingGUI {
+    /** The building instance being managed */
     private Building building;
 
-    // List models for displaying apartments and common rooms
+    /** List models for displaying room information */
     private DefaultListModel<String> apartmentListModel = new DefaultListModel<>();
     private DefaultListModel<String> commonRoomListModel = new DefaultListModel<>();
 
+    /** UI components for room displays */
     private JList<String> apartmentList;
     private JList<String> commonRoomList;
 
-    // Scheduler for real-time temperature updates
+    /** Scheduler for periodic UI updates */
     private ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
     /**
-     * Constructor to initialize the building GUI.
+     * Creates a new BuildingGUI instance and initializes the interface.
+     * This constructor will:
+     * 
+     * - Set up the main window and all UI components
+     * - Initialize temperature monitoring
+     * - Start periodic updates of the display
      *
-     * @param building The building instance that this GUI manages.
+     * @param building The building instance to be managed through this interface
+     * @throws IllegalArgumentException if building is null
      */
     public BuildingGUI(Building building) {
+        if (building == null) {
+            throw new IllegalArgumentException("Building instance cannot be null");
+        }
         this.building = building;
         createAndShowGUI();
         startTemperatureUpdates();
     }
 
     /**
-     * Initializes and displays the main GUI window.
-     * This includes:
-     * - Temperature control input.
-     * - Lists for displaying apartments and common rooms.
-     * - A button to open the "Add Room" dialog.
+     * Creates and displays the main application window.
+     * Sets up all UI components including:
+     * 
+     * - Temperature control panel
+     * - Room lists (apartments and common areas)
+     * - Add room functionality
      */
     private void createAndShowGUI() {
         JFrame frame = new JFrame(PropertyLoader.getProperty("gui.window.title"));
@@ -121,8 +142,13 @@ public class BuildingGUI {
     }
 
     /**
-     * Displays a pop-up dialog to add new apartments or common rooms.
-     * The user selects a room type and enters necessary details.
+     * Displays a modal dialog for adding new rooms to the building.
+     * The dialog provides options for:
+     * 
+     * - Adding apartments with owner information
+     * - Adding common rooms of various types (GYM, LIBRARY, LAUNDRY)
+     * 
+     * Input validation is performed before adding any new room.
      */
     private void showAddRoomDialog() {
         JDialog dialog = new JDialog((Frame) null, "Add Room", true);
@@ -183,13 +209,21 @@ public class BuildingGUI {
     }
 
     /**
-     * Sets a placeholder text in a JTextField.
-     * The placeholder disappears when the user starts typing and reappears when empty.
+     * Configures a text field with placeholder text functionality.
+     * The placeholder text will:
+     * 
+     * - Display in gray when the field is empty
+     * - Disappear when the field gains focus
+     * - Reappear when the field loses focus and is empty
      *
-     * @param textField       The JTextField where the placeholder is applied.
-     * @param placeholderText The placeholder text.
+     * @param textField The text field to configure
+     * @param placeholderText The text to display as placeholder
+     * @throws IllegalArgumentException if either parameter is null
      */
     private void setPlaceholder(JTextField textField, String placeholderText) {
+        if (textField == null || placeholderText == null) {
+            throw new IllegalArgumentException("TextField and placeholder text cannot be null");
+        }
         textField.setForeground(Color.GRAY);
         textField.setText(placeholderText);
 
@@ -213,7 +247,15 @@ public class BuildingGUI {
     }
 
     /**
-     * Refreshes the lists of apartments and common rooms in the GUI.
+     * Updates the display of all rooms in the GUI.
+     * This method:
+     * 
+     * - Clears existing room displays
+     * - Retrieves current room information from the building
+     * - Updates both apartment and common room lists
+     * - Formats temperature and status information
+     * 
+     * Updates are performed on the Event Dispatch Thread to ensure thread safety.
      */
     private void refreshRoomLists() {
         SwingUtilities.invokeLater(() -> {
@@ -237,7 +279,11 @@ public class BuildingGUI {
     }
 
     /**
-     * Starts a scheduled task to update room temperatures every second.
+     * Initiates periodic updates of the room temperature display.
+     * Updates occur at intervals specified in the application properties.
+     * The update frequency can be configured through the 'gui.refresh.interval' property.
+     *
+     * @see PropertyLoader#getIntProperty(String)
      */
     private void startTemperatureUpdates() {
         scheduler.scheduleAtFixedRate(
