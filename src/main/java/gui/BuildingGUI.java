@@ -9,6 +9,7 @@ import java.awt.event.FocusEvent;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import utils.PropertyLoader;
 
 /**
  * GUI class for controlling the building temperature and managing rooms.
@@ -50,9 +51,12 @@ public class BuildingGUI {
      * - A button to open the "Add Room" dialog.
      */
     private void createAndShowGUI() {
-        JFrame frame = new JFrame("Building Controls");
+        JFrame frame = new JFrame(PropertyLoader.getProperty("gui.window.title"));
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(500, 400);
+        frame.setSize(
+            PropertyLoader.getIntProperty("gui.window.width"),
+            PropertyLoader.getIntProperty("gui.window.height")
+        );
         frame.setLayout(new BorderLayout());
 
         // ----- Panels for Apartments and Common Rooms -----
@@ -79,7 +83,7 @@ public class BuildingGUI {
         // ----- Temperature Control Panel -----
         JPanel tempPanel = new JPanel(new FlowLayout());
         JLabel tempLabel = new JLabel("Set Temperature:");
-        JTextField tempField = new JTextField(5);
+        JTextField tempField = new JTextField(PropertyLoader.getIntProperty("gui.temperature.field.width"));
         JButton setTempButton = new JButton("Set");
 
         tempPanel.add(tempLabel);
@@ -122,7 +126,10 @@ public class BuildingGUI {
      */
     private void showAddRoomDialog() {
         JDialog dialog = new JDialog((Frame) null, "Add Room", true);
-        dialog.setSize(300, 200);
+        dialog.setSize(
+            PropertyLoader.getIntProperty("gui.dialog.width"),
+            PropertyLoader.getIntProperty("gui.dialog.height")
+        );
         dialog.setLayout(new FlowLayout());
 
         JLabel roomTypeLabel = new JLabel("Select Room Type:");
@@ -233,7 +240,12 @@ public class BuildingGUI {
      * Starts a scheduled task to update room temperatures every second.
      */
     private void startTemperatureUpdates() {
-        scheduler.scheduleAtFixedRate(this::refreshRoomLists, 0, 1, TimeUnit.SECONDS);
+        scheduler.scheduleAtFixedRate(
+            this::refreshRoomLists,
+            0,
+            PropertyLoader.getIntProperty("gui.refresh.interval"),
+            TimeUnit.SECONDS
+        );
     }
 }
 
