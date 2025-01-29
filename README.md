@@ -2,25 +2,75 @@
 
 A Java Swing application for managing temperature control in an apartment building.
 
-## Prerequisites
+## Project Structure
 
+```
+ApartmentBuilding/
+├── src/main/java/
+│   ├── models/
+│   │   ├── Room.java          # Base class for all rooms
+│   │   ├── Apartment.java     # Apartment implementation
+│   │   ├── CommonRoom.java    # Common area implementation
+│   │   └── Building.java      # Main building management
+│   ├── gui/
+│   │   └── BuildingGUI.java   # Graphical user interface
+│   ├── utils/
+│   │   └── PropertyLoader.java # Configuration utilities
+│   └── Main.java              # Application entry point
+├── src/main/resources/
+│   └── application.properties  # Application configuration
+├── build.gradle               # Gradle build configuration
+├── Dockerfile                 # Docker configuration
+├── run-app.sh                 # Platform-specific run script
+├── gradlew                    # Gradle wrapper script
+├── apartment-building.jar    # Built JAR file
+└── README.md                  # This file
+```
+
+## Features
+
+- Real-time temperature monitoring
+- Individual room temperature control
+- Support for apartments and common areas
+- Automatic temperature adjustment
+- User-friendly graphical interface
+
+## Running the Application
+
+There are three ways to run this application, listed from simplest to most complex:
+
+### Method 1: Direct JAR Execution (Simplest)
+
+**Prerequisites:**
+- Java 17 or later installed
+
+**Steps:**
+1. Clone the repository:
+```bash
+git clone [repository-url]
+cd apartment-building
+```
+2. Run the application:
+```bash
+java -jar apartment-building.jar
+```
+
+### Method 2: Using Docker (Recommended for Consistent Environment)
+
+**Prerequisites:**
 - Docker installed and running
-- X11 server (varies by operating system):
-  - Linux: Built-in (no action needed)
-  - macOS: XQuartz
-  - Windows: VcXsrv
+- X11 server (same as Method 1)
 
-## Setup Instructions by Platform
+**Platform-Specific Instructions:**
 
-### Linux
-1. No additional setup required
-2. Run:
+#### Linux
+1. Run:
 ```bash
 chmod +x run-app.sh
 ./run-app.sh
 ```
 
-### macOS
+#### macOS
 1. Install XQuartz:
 ```bash
 brew install --cask xquartz
@@ -42,13 +92,13 @@ brew install --cask xquartz
    - Start XQuartz again
    - Try running the application again
 
-4. Run the application:
+4. Run:
 ```bash
 chmod +x run-app.sh
 ./run-app.sh
 ```
 
-### Windows
+#### Windows
 1. Install VcXsrv Windows X Server:
    - Download from: https://sourceforge.net/projects/vcxsrv/
    - Install with default settings
@@ -63,66 +113,53 @@ chmod +x run-app.sh
    - Download from: https://git-scm.com/download/win
    - During installation, select "Use MinTTY" option
 
-4. Run the application:
-   - Open Git Bash
-   - Navigate to project directory
-   - Run:
+4. Run:
 ```bash
 chmod +x run-app.sh
 ./run-app.sh
 ```
 
-### Windows Troubleshooting
+#### Docker Method Troubleshooting
 
-1. If you see "input device is not a TTY" error:
-   - Make sure you're using Git Bash (MinTTY)
-   - The script will automatically use winpty if available
-   - If issues persist, try running Git Bash as Administrator
+See the troubleshooting sections under each platform's instructions above.
 
-2. If the application window doesn't appear:
-   - Make sure VcXsrv is running and configured correctly
-   - Check Windows Defender Firewall settings:
-     - Open Windows Defender Firewall
-     - Allow VcXsrv through both private and public networks
-   - Try restarting VcXsrv and running the script again
+### Method 3: Building from Source (For Developers)
 
-3. If you get a display error:
-   - Make sure no other X server is running
-   - Check that the DISPLAY variable is set correctly
-   - Try running XLaunch again with the settings mentioned above
+**Prerequisites:**
+- JDK 17 or later installed
+- Git installed
 
-4. Common VcXsrv Settings Issues:
-   - Always use "Multiple Windows" mode
-   - Make sure "Disable access control" is checked
-   - Native opengl should be disabled
-   - No client launch needed
+**Steps:**
+1. Clone the repository:
+```bash
+git clone [repository-url]
+cd apartment-building
+```
 
-## Features
-
-- Real-time temperature monitoring
-- Individual room temperature control
-- Support for apartments and common areas
-- Automatic temperature adjustment
-- User-friendly graphical interface
-
-## Building from Source
-
-If you want to build without Docker:
-
-1. Ensure JDK 17 is installed
-
-2. Clean and build the project:
+2. Build the project:
 ```bash
 ./gradlew clean build
 ```
 
-3. Run the application:
+3. Run the built application:
 ```bash
-# On Windows
-java -jar build/libs/apartment-building.jar
-
-# On Linux/macOS
 java -jar build/libs/apartment-building.jar
 ```
 
-Note: When building from source, make sure you have a proper X11 server running on your system as described in the platform-specific setup instructions above.
+## Troubleshooting Common Issues
+
+
+### Java Version Issues
+```bash
+# Check Java version
+java -version
+```
+Make sure you have Java 17 or later installed.
+
+### Permission Issues
+If you encounter permission denied errors:
+```bash
+# Make scripts executable
+chmod +x gradlew
+chmod +x run-app.sh
+```
