@@ -59,7 +59,7 @@ java -jar apartment-building.jar
 
 **Prerequisites:**
 - Docker installed and running
-- X11 server (same as Method 1)
+- X11 server except for Linux user
 
 **Platform-Specific Instructions:**
 
