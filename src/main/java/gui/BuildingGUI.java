@@ -81,34 +81,54 @@ public class BuildingGUI {
         JLabel roomTypeLabel = new JLabel("Add Room:");
         String[] roomTypes = {"Apartment", "Common Room"};
         JComboBox<String> roomTypeCombo = new JComboBox<>(roomTypes);
-        JTextField ownerOrTypeField = new JTextField(10);
+
+        // Input field for Apartment Owner Name (Common Room now uses dropdown)
+        JTextField ownerNameField = new JTextField(10);
+
+        // Dropdown for selecting Common Room Type
+        JComboBox<String> commonRoomDropdown = new JComboBox<>(new String[]{"Gym", "Library", "Laundry"});
+        commonRoomDropdown.setVisible(false); // Initially hidden
+
         JButton addRoomButton = new JButton("Add");
 
         addRoomPanel.add(roomTypeLabel);
         addRoomPanel.add(roomTypeCombo);
-        addRoomPanel.add(ownerOrTypeField);
+        addRoomPanel.add(ownerNameField);
+        addRoomPanel.add(commonRoomDropdown);
         addRoomPanel.add(addRoomButton);
+
+        // Change input field when selecting a room type
+        roomTypeCombo.addActionListener(e -> {
+            String selectedType = (String) roomTypeCombo.getSelectedItem();
+            if (selectedType.equals("Apartment")) {
+                ownerNameField.setVisible(true);
+                commonRoomDropdown.setVisible(false);
+                ownerNameField.setText(""); // Clear input when switching
+            } else {
+                ownerNameField.setVisible(false);
+                commonRoomDropdown.setVisible(true);
+            }
+            addRoomPanel.revalidate();
+            addRoomPanel.repaint();
+        });
 
         addRoomButton.addActionListener(e -> {
             String selectedType = (String) roomTypeCombo.getSelectedItem();
-            String inputText = ownerOrTypeField.getText();
 
             if (selectedType.equals("Apartment")) {
-                if (inputText.isEmpty()) {
+                String ownerName = ownerNameField.getText();
+                if (ownerName.isEmpty()) {
                     JOptionPane.showMessageDialog(frame, "Please provide an owner's name!", "Error", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
-                building.addRoom(new Apartment(inputText));
-                JOptionPane.showMessageDialog(frame, "Apartment added for owner: " + inputText);
-            } else if (selectedType.equals("Common Room")) {
-                try {
-                    CommonRoom.RoomType type = CommonRoom.RoomType.valueOf(inputText.toUpperCase());
-                    building.addRoom(new CommonRoom(type));
-                    JOptionPane.showMessageDialog(frame, "Common Room of type '" + inputText + "' added!");
-                } catch (IllegalArgumentException ex) {
-                    JOptionPane.showMessageDialog(frame, "Invalid type! Use Gym, Library, or Laundry.", "Error", JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
+                building.addRoom(new Apartment(ownerName));
+                JOptionPane.showMessageDialog(frame, "Apartment added for owner: " + ownerName);
+            } else {
+                // Common Room selection from dropdown
+                String selectedCommonRoom = (String) commonRoomDropdown.getSelectedItem();
+                CommonRoom.RoomType type = CommonRoom.RoomType.valueOf(selectedCommonRoom.toUpperCase());
+                building.addRoom(new CommonRoom(type));
+                JOptionPane.showMessageDialog(frame, "Common Room of type '" + selectedCommonRoom + "' added!");
             }
 
             refreshRoomLists();
@@ -137,7 +157,8 @@ public class BuildingGUI {
                             " - Temp: " + String.format("%.2f", apt.getCurrentTemperature()) + "°C");
                 } else if (room instanceof CommonRoom) {
                     CommonRoom cr = (CommonRoom) room;
-                    commonRoomListModel.addElement(cr.getType() +
+                    commonRoomListModel.addElement("ID: " + cr.getId() +
+                            " - Type: " + cr.getType() +
                             " - Temp: " + String.format("%.2f", cr.getCurrentTemperature()) + "°C");
                 }
             }
