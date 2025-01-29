@@ -119,10 +119,6 @@ chmod +x run-app.sh
 ./run-app.sh
 ```
 
-#### Docker Method Troubleshooting
-
-See the troubleshooting sections under each platform's instructions above.
-
 ### Method 3: Building from Source (For Developers)
 
 **Prerequisites:**
