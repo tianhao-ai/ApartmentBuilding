@@ -47,7 +47,7 @@ There are three ways to run this application, listed from simplest to most compl
 **Steps:**
 1. Clone the repository:
 ```bash
-git clone [repository-url]
+git clone [[repository-url]](https://github.com/tianhao-ai/ApartmentBuilding.git)
 cd apartment-building
 ```
 2. Run the application:
@@ -132,7 +132,7 @@ See the troubleshooting sections under each platform's instructions above.
 **Steps:**
 1. Clone the repository:
 ```bash
-git clone [repository-url]
+git clone [[repository-url]](https://github.com/tianhao-ai/ApartmentBuilding.git)
 cd apartment-building
 ```
 
