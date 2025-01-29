@@ -30,4 +30,5 @@ jar {
                 'Main-Class': 'Main'
         )
     }
+    archiveFileName = 'apartment-building.jar'
 }
