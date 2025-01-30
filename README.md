@@ -37,6 +37,57 @@ ApartmentBuilding/
 - Automatic temperature adjustment
 - User-friendly graphical interface
 
+## Implementation Assumptions
+
+1. **User Interface Implementation**
+   - Based on the requirement for user input (setpoint and room addition), the application implements a graphical user interface using Java Swing library
+   - GUI provides intuitive controls for temperature management and room addition
+
+2. **Temperature Control Mechanism**
+   - Temperature changes occur gradually at a fixed rate of 0.1°C per second
+   - This simulates realistic heating/cooling behavior in physical rooms
+
+3. **Temperature Monitoring**
+   - A scheduler runs every 10 seconds to check each room's temperature
+   - Automatically adjusts heating/cooling based on current conditions
+
+4. **Temperature Threshold**
+   - "Close enough" is defined as ±1°C from the requested temperature
+   - When room temperature is within this threshold, both heating and cooling are disabled
+
+5. **Apartment Numbering System**
+   - Apartments are numbered starting from 101, incrementing by 1 (101, 102, etc.)
+   - Each apartment requires an owner name, which is separate from the apartment number
+   - Apartment numbers are automatically assigned while owner names are user-provided
+
+6. **Development Process**
+   - Feature development followed Git branch workflow
+   - Each feature was developed in a separate branch
+   - Changes were reviewed through pull requests before merging
+   - Pull request history available for feature development tracking
+
+7. **Containerization**
+   - Application is containerized using Docker
+   - Assumes Docker is installed and running on the host system
+   - Provides platform-specific run scripts for easy deployment
+
+8. **Build System**
+   - Uses Gradle as the build tool
+   - Provides both build.gradle and Gradle wrapper for consistent builds
+
+## Potential Improvements
+
+1. **Room Management**
+   - Current implementation only supports adding rooms
+   - Future improvement: Implement room removal functionality
+   - Consider adding room modification capabilities (e.g., changing owner names)
+
+2. **GUI Enhancements**
+   - Current GUI shows temperature changes but not explicit heater/cooler status
+   - Future improvement: Add visual indicators for heating/cooling status
+   - Consider adding graphical representation of temperature trends
+   - Potential for more detailed room status display
+
 ## Running the Application
 
 There are three ways to run this application, listed from simplest to most complex:
